@@ -203,6 +203,13 @@ class Git:
             kwargs["username"] = credentials.username
             kwargs["password"] = credentials.password
 
+        # at lower verbosity levels interactive prompts from ssh are either hidden completely
+        # or partly hidden by poetry writing over the last line of output
+        # if the logging level is DEBUG poetry was likely run with -vvv and an interactive prompt
+        # will probably be displayed correctly
+        if not logger.isEnabledFor(logging.DEBUG):
+            kwargs['ssh_command'] = 'ssh -o BatchMode=yes'
+
         config = local.get_config_stack()
         client, path = get_transport_and_path(url, config=config, **kwargs)
 
